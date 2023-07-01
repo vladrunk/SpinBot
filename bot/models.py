@@ -72,6 +72,11 @@ class Sessions(models.Model):
         verbose_name='Chat ID',
         help_text='ID чата в котором созданна сессия',
     )
+    thread_id = models.IntegerField(
+        default=0,
+        verbose_name='Thread ID',
+        help_text='ID темы в которой созданна сессия',
+    )
     user = models.ForeignKey(
         to=Users,
         on_delete=models.CASCADE,

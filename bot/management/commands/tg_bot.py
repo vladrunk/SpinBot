@@ -406,6 +406,7 @@ class Bot:
             chat_id=c.session.chat_id,
             emoji='🎰',
             disable_notification=True,
+            message_thread_id=c.session.thread_id,
         )
 
         comb = Combinations.objects.get(id=message_dice.dice.value)
@@ -487,7 +488,7 @@ class Bot:
             )
             return
 
-        session = Sessions.objects.create(chat_id=message.chat.id, user=user)
+        session = Sessions.objects.create(chat_id=message.chat.id, thread_id=message.message_thread_id, user=user)
 
         text = MESSAGE_SESSION.format(username=username, session_id=session.id, )
 
@@ -496,6 +497,7 @@ class Bot:
             text=text,
             parse_mode='MarkdownV2',
             disable_notification=True,
+            message_thread_id=session.thread_id,
             reply_markup=self.__markup_make_bet(session)
         )
 
