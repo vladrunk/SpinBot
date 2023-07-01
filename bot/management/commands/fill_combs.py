@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from bot.models import Combinations
 from pprint import pprint
 
+
 class Command(BaseCommand):
     help = 'Fill combinations'
 
@@ -29,4 +30,3 @@ class Command(BaseCommand):
                 mult=combination['mult'],
             )
             pprint(f'Added: {c}')
-

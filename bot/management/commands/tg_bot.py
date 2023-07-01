@@ -10,7 +10,7 @@ from SpinBot.settings import (
     BOT_TOKEN,
     INIT_BALANCE, ARCHIVE_CHANNEL_ID, DEBUG,
 )
-from .helpers.callbacks_data import (
+from bot.management.commands.helpers.callbacks_data import (
     CALLBACK_BALANCE_DATA,
     CALLBACK_BALANCE_NAME,
     CALLBACK_MAKEBET_DATA,
@@ -23,7 +23,7 @@ from .helpers.callbacks_data import (
     CALLBACK_MAKESPIN_DATA,
     CALLBACK_MAKESPIN_NAME, CALLBACK_TOPUP_DATA, CALLBACK_TOPUP_NAME,
 )
-from .helpers.texts import (
+from bot.management.commands.helpers.texts import (
     MESSAGE_START,
     MESSAGE_BALANCE,
     MESSAGE_MAKE_BET,
@@ -40,8 +40,7 @@ from .helpers.texts import (
     NOTIFY_NOT_ENOUGH_MONEY,
     CALLBACK_TOPUP_TEXT, MESSAGE_CLOSE_SESSION,
 )
-from time import sleep
-from .models import (
+from bot.models import (
     Users,
     Sessions,
     CallbackMakeBet,
@@ -50,6 +49,7 @@ from .models import (
     CallbackMakeSpin,
     Combinations,
 )
+from django.core.management.base import BaseCommand
 
 
 def update_listener(us):
@@ -65,7 +65,6 @@ class Bot:
         self.__bot_username = self.__get_username(user=self.__bot.get_me())
         self.__archive = self.__bot.get_chat(chat_id=ARCHIVE_CHANNEL_ID)
         self.__archive_username = f'@{self.__archive.username}'.replace('_', '\_')
-        self.running = False
 
     @staticmethod
     def __markup_show_balance(user_id: int):
@@ -541,20 +540,15 @@ class Bot:
         def handler_cmd_game(message: Message):
             self.__cmd_game(message)
 
-        while self.running:
-            try:
-                self.__bot.polling()
-            except Exception as e:
-                print(e)
-                sleep(5)
+        self.__bot.polling()
 
     def start(self):
-        self.running = True
         self.__main()
 
-    def stop(self):
-        self.running = False
-        self.__bot.stop_polling()
 
+class Command(BaseCommand):
+    help = 'Start bot'
 
-bot = Bot()
+    def handle(self, *args, **options):
+        bot = Bot()
+        bot.start()

@@ -1,7 +1,7 @@
 #!/bin/zsh
 
-#sudo apt update
-#sudo apt install nginx -y
+sudo apt update
+sudo apt install nginx -y
 
 SCRIPT_PATH=$(dirname "$(realpath "$0")")
 echo "Worked dir: $SCRIPT_PATH"
@@ -11,7 +11,8 @@ echo "Activate env: $ENV_PATH"
 . $ENV_PATH/bin/activate 
 
 echo "Worked python: $(which python)"
-echo "Enviroment Python version: $(python -V)"
+echo "Environment Python version: $(python -V)"
+$PYTHON=$ENV_PATH/bin/python
 
 cd "$SCRIPT_PATH"
 
@@ -21,10 +22,11 @@ python manage.py migrate
 
 python manage.py collectstatic --noinput
 
+mkdir logs
 mkdir $SCRIPT_PATH/systemd
 echo "
 [Unit]
-Description=SpinBot Gunicorn Daemon
+Description=SpinBotAdmin Gunicorn Daemon
 After=network.target
 
 [Service]
@@ -40,10 +42,26 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+" | tee $SCRIPT_PATH/systemd/spinbotadmin.service
+
+echo "
+[Unit]
+Description=SpinBot Gunicorn Daemon
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=$SCRIPT_PATH
+ExecStart=$PYTHON $SCRIPT_PATH/manage.py tg_bot
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
 " | tee $SCRIPT_PATH/systemd/spinbot.service
 
-sudo systemctl disable spinbot.service
-sudo systemctl enable $SCRIPT_PATH/systemd/spinbot.service
+sudo systemctl disable spinbotadmin.service spinbot.service
+sudo systemctl enable $SCRIPT_PATH/systemd/spinbot.service $SCRIPT_PATH/systemd/spinbotadmin.service
 
 mkdir $SCRIPT_PATH/nginx
 echo "
