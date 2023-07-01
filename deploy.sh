@@ -12,7 +12,7 @@ echo "Activate env: $ENV_PATH"
 
 echo "Worked python: $(which python)"
 echo "Environment Python version: $(python -V)"
-$PYTHON=$ENV_PATH/bin/python
+PYTHON=$ENV_PATH/bin/python
 
 cd "$SCRIPT_PATH"
 
