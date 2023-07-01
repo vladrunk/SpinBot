@@ -21,6 +21,7 @@ python manage.py migrate
 
 python manage.py collectstatic --noinput
 
+mkdir $SCRIPT_PATH/systemd
 echo "
 [Unit]
 Description=SpinBot Gunicorn Daemon
@@ -44,6 +45,7 @@ WantedBy=multi-user.target
 sudo systemctl disable spinbot.service
 sudo systemctl enable $SCRIPT_PATH/systemd/spinbot.service
 
+mkdir $SCRIPT_PATH/nginx
 echo "
 server {
     listen 80;
